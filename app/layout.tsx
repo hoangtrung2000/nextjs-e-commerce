@@ -1,5 +1,4 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/footer/Footer";
+import Navbar from "@/components/nav/Navbar";
 import CartProvider from "@/providers/CartProvider";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
   description: "E-commerce app",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -24,7 +23,6 @@ export default function RootLayout({
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <main className="flex-1">{children}</main>
-            <Footer />
           </div>
         </CartProvider>
       </body>

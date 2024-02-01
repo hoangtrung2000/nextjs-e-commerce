@@ -6,9 +6,17 @@ import Link from "next/link";
 import { MdArrowBack } from "react-icons/md";
 import ItemContent from "./ItemContent";
 import { formatPrice } from "@/utils";
+import { SafeUser } from "@/types";
+import { useRouter } from "next/navigation";
 
-const CartClient = () => {
+interface Props {
+  currentUser: SafeUser | null;
+}
+
+const CartClient = ({ currentUser }: Props) => {
   const { cartProducts, handleClearCart, cartTotalAmount } = useCart();
+  const router = useRouter();
+
   if (!cartProducts || cartProducts.length === 0)
     return (
       <div className="flex flex-col items-center">
@@ -58,7 +66,12 @@ const CartClient = () => {
             <p className="text-slate-500">
               Taxes and shipping calculate at checkout
             </p>
-            <Button label="Checkout" onClick={() => {}} />
+            <Button
+              label={currentUser ? "Checkout" : "Login to Checkout"}
+              onClick={() => {
+                currentUser ? router.push("/checkout") : router.push("/login");
+              }}
+            />
             <Link
               href="/"
               className="text-slate-500 flex items-center gap-1 mt-2"

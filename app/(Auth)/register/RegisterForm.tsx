@@ -3,13 +3,22 @@
 import Heading from "@/components/Heading";
 import Button from "@/components/Product/Button";
 import Input from "@/components/inputs/Input";
+import { SafeUser } from "@/types";
+import axios from "axios";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { AiOutlineGoogle } from "react-icons/ai";
 
-const RegisterForm = () => {
+interface Props {
+  currentUser: SafeUser | null;
+}
+
+const RegisterForm = ({ currentUser }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -21,18 +30,56 @@ const RegisterForm = () => {
       password: "",
     },
   });
-  const onSubmit: SubmitHandler<FieldValues> = (data: any) => {
-    // setIsLoading(true)
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    setIsLoading(true);
+
+    axios
+      .post("/api/register", data)
+      .then(() => {
+        alert("Account created");
+        signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        }).then((response) => {
+          if (response?.ok) {
+            router.push("/cart");
+            router.refresh();
+            alert("Login successful");
+          }
+          if (response?.error) {
+            alert("Error: " + response.error);
+          }
+        });
+      })
+      .catch(() => {
+        alert("Something went wrong");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
+
+  useEffect(() => {
+    if (currentUser) {
+      router.push("/cart");
+      router.refresh();
+    }
+  }, []);
+
+  if (currentUser)
+    return <p className="text-center">Signed in, Redirecting...</p>;
 
   return (
     <>
       <Heading title="Sign up for E-shop" />
       <Button
-        label="Sign up with Google"
+        label="Continue with Google"
         variants="outline"
         icon={AiOutlineGoogle}
-        onClick={() => {}}
+        onClick={() => {
+          signIn("google");
+        }}
       />
       <hr className="bg-slate-300 w-full h-px" />
       <Input

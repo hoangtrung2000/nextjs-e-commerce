@@ -2,7 +2,7 @@ import Image from "next/image";
 import { FaUserCircle } from "react-icons/fa";
 
 type Props = {
-  src?: string;
+  src?: string | null;
 };
 const Avatar = ({ src }: Props) => {
   if (!src) return <FaUserCircle size="24" />;

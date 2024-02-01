@@ -1,5 +1,6 @@
 "use client";
 
+import { CartProduct } from "@prisma/client";
 import {
   createContext,
   useCallback,
@@ -17,6 +18,8 @@ type CartContextProps = {
   handleIncreaseCart: (product: CartProduct) => void;
   handleDecreaseCart: (product: CartProduct) => void;
   handleClearCart: () => void;
+  paymentIntent: string | null;
+  handleSetPaymentIntent: (value: string | null) => void;
 };
 
 type Props = {
@@ -29,11 +32,16 @@ export const CartContextProvider = (props: Props) => {
   const [cartTotalQty, setCartTotalQty] = useState<number>(0);
   const [cartTotalAmount, setCartTotalAmount] = useState<number>(0);
   const [cartProducts, setCartProducts] = useState<CartProduct[] | null>(null);
+  const [paymentIntent, setPaymentIntent] = useState<string | null>(null);
 
   useEffect(() => {
     const cartItems: any = localStorage.getItem("eShopCartItems");
     const cProducts: CartProduct[] | null = JSON.parse(cartItems);
+    const eShopPaymentIntent: any = localStorage.getItem("eShopPaymentIntent");
+    const paymentIntent: string | null = JSON.parse(eShopPaymentIntent);
+
     setCartProducts(cProducts);
+    setPaymentIntent(paymentIntent);
   }, []);
 
   useEffect(() => {
@@ -127,15 +135,25 @@ export const CartContextProvider = (props: Props) => {
     localStorage.setItem("eShopCartItems", JSON.stringify(null));
   }, []);
 
+  const handleSetPaymentIntent = useCallback(
+    (value: string | null) => {
+      setPaymentIntent(value);
+      localStorage.setItem("eShopPaymentIntent", JSON.stringify(value));
+    },
+    [paymentIntent]
+  );
+
   const value = {
     cartTotalQty,
     cartProducts,
     cartTotalAmount,
+    paymentIntent,
     handleAddProduct,
     handleRemoveProduct,
     handleIncreaseCart,
     handleDecreaseCart,
     handleClearCart,
+    handleSetPaymentIntent,
   };
   return <CartContext.Provider value={value} {...props} />;
 };

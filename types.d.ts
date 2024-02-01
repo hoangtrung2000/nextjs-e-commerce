@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+
 interface Product {
   id: string;
   name: string;
@@ -21,17 +23,11 @@ interface ProductImage {
   image: string;
 }
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean | null;
-  image: string;
-  hashedPassword: string | null;
+type SafeUser = Omit<User, "createdAt" | "updatedAt" | "emailVerified"> & {
   createdAt: string;
   updatedAt: string;
-  role: "ADMIN" | "USER";
-}
+  emailVerified: string | null;
+};
 
 interface Review {
   id: string;
